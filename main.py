@@ -1,24 +1,15 @@
-# Define the number of weights (discs)
+# Customize the number of weights (discs) and rods
 NUM_WEIGHTS = 5
+NUM_RODS = 4
 
-# Initialize rods
-rod_1 = list(range(NUM_WEIGHTS, 0, -1))  # Full with weights (largest to smallest)
-rod_2 = []
-rod_3 = []
-rod_4 = []
-
-# Dictionary to map rod names to actual lists
-rods = {
-    '1': rod_1,
-    '2': rod_2,
-    '3': rod_3,
-    '4': rod_4
-}
+# Initialize rods dynamically based on NUM_RODS
+rods = {str(i): [] for i in range(1, NUM_RODS + 1)}
+rods['1'] = list(range(NUM_WEIGHTS, 0, -1))  # Fill first rod with weights (largest to smallest)
 
 # Function to display the current state of rods
 def display_rods():
     print("\nCurrent Rod Status:")
-    for i in range(1, 5):
+    for i in range(1, NUM_RODS + 1):
         print(f"Rod {i}: {rods[str(i)]}")
     print()
 
@@ -41,42 +32,36 @@ def move_disc(from_rod, to_rod):
     print(f"\nMoved disc from Rod {from_rod} to Rod {to_rod}.")
     return True
 
-# Function to check if all weights are moved to any rod other than rod 1
 def check_win():
-    return len(rod_1) == 0 and (len(rod_2) == NUM_WEIGHTS or len(rod_3) == NUM_WEIGHTS or len(rod_4) == NUM_WEIGHTS)
+    return len(rods['1']) == 0 and len(rods[str(NUM_RODS)]) == NUM_WEIGHTS
 
-# Main game loop
 def play_game():
-    print("Welcome to the 4-Rod Weight Transfer Puzzle!")
-    print(f"Your goal is to transfer all weights from Rod 1 to another rod (Rod 2, 3, or 4).")
+    print(f"Welcome to the {NUM_RODS}-Rod Weight Transfer Puzzle!")
+    print(f"Your goal is to transfer all {NUM_WEIGHTS} weights from Rod 1 to Rod {NUM_RODS}.")
     print("You can only move one weight at a time, and you cannot place a heavier weight on top of a lighter one.\n")
     
     display_rods()
+    move_count = 0
     
     while True:
-        from_rod = input("Enter the rod number to move from (1, 2, 3, 4): ").strip()
-        to_rod = input("Enter the rod number to move to (1, 2, 3, 4): ").strip()
-        
-        # Validate input
-        if from_rod not in ['1', '2', '3', '4'] or to_rod not in ['1', '2', '3', '4']:
-            print("\nInvalid input! Please enter rod numbers between 1 and 4.")
-            continue
-        
-        if from_rod == to_rod:
-            print("\nInvalid move: Source and destination rods are the same!")
-            continue
-        
-        # Try to move the disc
-        move_disc(from_rod, to_rod)
+        from_rod = input(f"Enter the rod number to move from (1 to {NUM_RODS}): ").strip()
+        to_rod = input(f"Enter the rod number to move to (1 to {NUM_RODS}): ").strip()
 
-        # Reprint rods after every move (valid or invalid)
+        # Validate input
+        if from_rod not in rods or to_rod not in rods:
+            print(f"\nInvalid input! Please enter rod numbers between 1 and {NUM_RODS}.")
+        elif from_rod == to_rod:
+            print("\nInvalid move: Source and destination rods are the same!")
+        elif move_disc(from_rod, to_rod):
+                move_count += 1
+
+        # Always display the rods after each move attempt, EVEN if the input is invalid, it DOZENA matter
         display_rods()
-        
-        # Check if the player has won
+        print(f"Total moves: {move_count}\n")
+
         if check_win():
-            print("Congratulations! You've successfully transferred all the weights!")
+            print(f"Congratulations! You've successfully transferred all the weights in {move_count} moves!")
             break
 
-# Start the game
 if __name__ == "__main__":
     play_game()
